@@ -23,7 +23,8 @@ stdout.printf("%s\n", obj.to_string());
   "ProductID" : 12345,
   "Name" : "WidgetTransformer",
   "MinutesToBuild" : 3.25
-}```
+}
+```
 
 ### Compiling:
 To compile and run the demo in this repo, use the following commands:
