@@ -1,6 +1,6 @@
 namespace EasyJSON {
 
-  class JSONObject {
+  class JSONObject : GLib.Object {
 
     private Json.Builder builder;
     private Json.Generator generator;
@@ -31,18 +31,49 @@ namespace EasyJSON {
 
           switch (type) {
             case JVal.String:
-              string value = args.arg();
-              this.builder.add_string_value(value);
+              string val = args.arg();
+              this.builder.add_string_value(val);
               break;
 
             case JVal.Int:
-              int value = args.arg();
-              this.builder.add_int_value(value);
+              int val = args.arg();
+              this.builder.add_int_value(val);
               break;
 
             case JVal.Double:
-              double value = args.arg();
-              this.builder.add_double_value(value);
+              double val = args.arg();
+              this.builder.add_double_value(val);
+              break;
+
+            /*case JVal.Array:
+              JVal arrayType = args.arg();
+              switch (arrayType) {
+                case JVal.String:
+                  string[] arrayValues = args.arg();
+                  this.add_string_array(arrayValues);
+                  break;
+
+                case JVal.Int:
+                  int[] arrayValues = args.arg();
+                  this.add_int_array(arrayValues);
+                  break;
+
+                case JVal.Double:
+                  double[] arrayValues = args.arg();
+                  this.add_double_array(arrayValues);
+                  break;
+
+                case JVal.Object:
+                  JSONObject[] arrayValues = args.arg();
+                  this.add_object_array(arrayValues);
+                  break;
+              }
+
+              break;*/
+
+            case JVal.Object:
+              JSONObject? val = args.arg();
+              this.add_object(val);
               break;
           }
       }
@@ -54,6 +85,38 @@ namespace EasyJSON {
 
     public string to_string() {
       return this.generator.to_data(null);
+    }
+
+    public Json.Node? get_root_node() {
+      return this.builder.get_root();
+    }
+
+    private void add_int_array(int[] values) {
+      this.builder.begin_array();
+      foreach (int value in values) {
+        this.builder.add_int_value(value);
+      }
+
+      this.builder.end_array();
+    }
+
+    private void add_object(Object obj) {
+      if (obj is JSONObject) {
+        this.add_json_object(obj as JSONObject);
+        return;
+      }
+
+      var rootNode = Json.gobject_serialize(obj);
+      this.builder.add_value(rootNode);
+    }
+
+    private void add_json_object(JSONObject obj) {
+      var rootNode = obj.get_root_node();
+      if (rootNode == null) {
+        this.builder.add_null_value();
+      } else {
+        this.builder.add_value(rootNode);
+      }
     }
 
   }
