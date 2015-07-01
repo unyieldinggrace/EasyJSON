@@ -1,3 +1,5 @@
+using Gee;
+
 namespace EasyJSON {
 
   class JSONObject : GLib.Object {
@@ -35,6 +37,15 @@ namespace EasyJSON {
               this.builder.add_string_value(val);
               break;
 
+            case JVal.Bool:
+              bool val = args.arg();
+              this.builder.add_boolean_value(val);
+              break;
+
+            case JVal.Null:
+              this.builder.add_null_value();
+              break;
+
             case JVal.Int:
               int val = args.arg();
               this.builder.add_int_value(val);
@@ -45,31 +56,36 @@ namespace EasyJSON {
               this.builder.add_double_value(val);
               break;
 
-            /*case JVal.Array:
+            case JVal.Array:
               JVal arrayType = args.arg();
               switch (arrayType) {
                 case JVal.String:
-                  string[] arrayValues = args.arg();
+                  Collection<string> arrayValues = args.arg();
                   this.add_string_array(arrayValues);
                   break;
 
+                case JVal.Bool:
+                  Collection<bool> arrayValues = args.arg();
+                  this.add_bool_array(arrayValues);
+                  break;
+
                 case JVal.Int:
-                  int[] arrayValues = args.arg();
+                  Collection<int> arrayValues = args.arg();
                   this.add_int_array(arrayValues);
                   break;
 
                 case JVal.Double:
-                  double[] arrayValues = args.arg();
+                  Collection<double?> arrayValues = args.arg();
                   this.add_double_array(arrayValues);
                   break;
 
                 case JVal.Object:
-                  JSONObject[] arrayValues = args.arg();
+                  Collection<Object> arrayValues = args.arg();
                   this.add_object_array(arrayValues);
                   break;
               }
 
-              break;*/
+              break;
 
             case JVal.Object:
               JSONObject? val = args.arg();
@@ -91,10 +107,46 @@ namespace EasyJSON {
       return this.builder.get_root();
     }
 
-    private void add_int_array(int[] values) {
+    private void add_string_array(Collection<string> values) {
+      this.builder.begin_array();
+      foreach (string value in values) {
+        this.builder.add_string_value(value);
+      }
+
+      this.builder.end_array();
+    }
+
+    private void add_int_array(Collection<int> values) {
       this.builder.begin_array();
       foreach (int value in values) {
         this.builder.add_int_value(value);
+      }
+
+      this.builder.end_array();
+    }
+
+    private void add_double_array(Collection<double?> values) {
+      this.builder.begin_array();
+      foreach (double value in values) {
+        this.builder.add_double_value(value);
+      }
+
+      this.builder.end_array();
+    }
+
+    private void add_bool_array(Collection<bool> values) {
+      this.builder.begin_array();
+      foreach (bool value in values) {
+        this.builder.add_boolean_value(value);
+      }
+
+      this.builder.end_array();
+    }
+
+    private void add_object_array(Collection<Object> values) {
+      this.builder.begin_array();
+      foreach (Object value in values) {
+        this.add_object(value);
       }
 
       this.builder.end_array();
@@ -122,13 +174,13 @@ namespace EasyJSON {
   }
 
   enum JVal {
-    String,
+    Null,
+    Bool,
     Int,
     Double,
-
-    // support for these is planned (or you could fork the code!)
-    Array,
-    Object
+    String,
+    Object,
+    Array
   }
 
 }
